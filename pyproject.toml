@@ -1,0 +1,15 @@
+[project]
+name = "tortoise-and-hare-paper-puppet"
+version = "1.0.0"
+description = "《龟兔赛跑》纸艺木偶动画：codex 生成素材 + MiniMax 旁白 + 程序化渲染 + 程序化配乐"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "skia-python>=144.0.post2",
+    "numpy>=2.5.4",
+    "pillow>=12.3.0",
+    "scipy>=1.18.1",
+]
+
+[tool.uv]
+package = false

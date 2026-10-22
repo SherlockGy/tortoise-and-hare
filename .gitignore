@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+v2/cache/
+out/
+*.mp4
+.DS_Store
+
+.env.*
+!.env.example
+*.pyc

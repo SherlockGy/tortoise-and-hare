@@ -1,0 +1,182 @@
+{
+ "hare_run_a": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -200.0,
+  "dy": 166.0
+ },
+ "hare_run_b": {
+  "base": "hare_run_a",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -11.0
+ },
+ "hare_blink": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": 0.0
+ },
+ "hare_talk": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": 0.0
+ },
+ "hare_taunt": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -26.0,
+  "dy": 6.0
+ },
+ "hare_eat": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -94.0,
+  "dy": 116.0
+ },
+ "hare_sad": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": 29.0,
+  "dy": 313.0
+ },
+ "hare_cheer": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -45.0,
+  "dy": 0.0
+ },
+ "hare_wake": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -59.0,
+  "dy": 19.0
+ },
+ "hare_sleep": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -201.0,
+  "dy": 228.0
+ },
+ "hare_snore": {
+  "base": "hare_stand",
+  "s": 1.0,
+  "dx": -201.0,
+  "dy": 227.0
+ },
+ "hare_sprint": {
+  "base": "hare_run_a",
+  "s": 1.0,
+  "dx": -23.0,
+  "dy": 315.0
+ },
+ "tortoise_walk_a": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": -16.0,
+  "dy": -2.0
+ },
+ "tortoise_walk_b": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -2.0
+ },
+ "tortoise_blink": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": 0.0
+ },
+ "tortoise_talk": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -33.0
+ },
+ "tortoise_look_up": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -42.0
+ },
+ "tortoise_determined": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": 43.0
+ },
+ "tortoise_tired": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": 0.0
+ },
+ "tortoise_cross": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": -122.0,
+  "dy": 85.0
+ },
+ "tortoise_cheer": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": 1.0,
+  "dy": -74.0
+ },
+ "tortoise_nod": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": -1.0,
+  "dy": 9.0
+ },
+ "tortoise_look_back": {
+  "base": "tortoise_stand",
+  "s": 1.0,
+  "dx": -1.0,
+  "dy": -13.0
+ },
+ "owl_talk": {
+  "base": "owl_stand",
+  "s": 1.0,
+  "dx": -95.0,
+  "dy": -2.0
+ },
+ "owl_wingup": {
+  "base": "owl_stand",
+  "s": 1.0008,
+  "dx": -95.9,
+  "dy": -22.5
+ },
+ "owl_blink": {
+  "base": "owl_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -1.0
+ },
+ "owl_cheer": {
+  "base": "owl_stand",
+  "s": 1.0008,
+  "dx": -109.0,
+  "dy": -3.5
+ },
+ "fox_cheer": {
+  "base": "fox_stand",
+  "s": 1.0,
+  "dx": 100.0,
+  "dy": 0.0
+ },
+ "hedgehog_cheer": {
+  "base": "hedgehog_stand",
+  "s": 1.0,
+  "dx": 0.0,
+  "dy": -1.0
+ },
+ "mouse_cheer": {
+  "base": "mouse_stand",
+  "s": 1.0,
+  "dx": 32.0,
+  "dy": -1.0
+ }
+}
