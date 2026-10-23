@@ -1,7 +1,6 @@
-# v2 分幕画面：每个函数输入幕内秒数 t，返回一帧 RGBA
+# 分幕画面：每个函数输入幕内秒数 t，返回一帧 RGBA
 import math, random
 from core import *
-from timeline import TL
 
 HS = 1.15   # 奔跑兔子相对缩放
 STRIDE = 350  # 奔跑每圈前进像素（与 HS 匹配，避免“滑步”）

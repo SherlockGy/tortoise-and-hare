@@ -2,6 +2,7 @@
 # 配器刻意不用金属打击乐（钟琴、铃、三角铁、钢片琴、木琴等）
 import random
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -10,10 +11,12 @@ import tinysoundfont as tsf
 from scipy.io import wavfile
 from scipy.signal import butter, fftconvolve, sosfilt
 
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "renderer"))
 from timeline import CUES, TL, TOTAL, beat_time, voice_spans
 
-ROOT = Path(__file__).resolve().parent.parent
 SF2 = ROOT / "assets" / "sf" / "GeneralUser-GS.sf2"
+# 本脚本写出 wav。成片读取的是 assets/music/music.m4a，仓库里没有 wav→m4a 的脚本。
 OUT = ROOT / "out" / "music.wav"
 VOICE_DIR = ROOT / "assets" / "voice"
 SR = 44100

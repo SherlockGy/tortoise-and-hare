@@ -168,10 +168,7 @@ def run_job(name, spec):
     t = time.time()
     r = None
     for attempt in range(2):
-        r = subprocess.run(cmd, cwd=RAW, input=prompt, capture_output=True, text=True, encoding="utf-8", errors="replace",
-                           env={**os.environ, "https_proxy": "http://127.0.0.1:7897", "http_proxy": "http://127.0.0.1:7897",
-                                "all_proxy": "http://127.0.0.1:7897", "HTTPS_PROXY": "http://127.0.0.1:7897",
-                                "HTTP_PROXY": "http://127.0.0.1:7897", "ALL_PROXY": "http://127.0.0.1:7897"})
+        r = subprocess.run(cmd, cwd=RAW, input=prompt, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if out.exists():
             return name, f"ok {time.time() - t:.0f}s"
     return name, "FAIL: " + (r.stdout or "")[-400:] + (r.stderr or "")[-400:]
