@@ -128,7 +128,7 @@ python3 renderer/snap.py out/check.jpg 3 50 88 138 155 169 195 225
    抠图脚本 `tools/key_raw.py` import SciPy；`tools/music.py` import SciPy 和 tinysoundfont。这两项在可选依赖 `music` 里，不在渲染安装里：
 
    ```bash
-   pip install -r requirements-tools.txt
+   pip install -r requirements.txt -r requirements-tools.txt
    # 或者，在仓库根目录：pip install -e ".[music]"
    ```
 
