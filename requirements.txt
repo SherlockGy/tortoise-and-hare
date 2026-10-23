@@ -1,5 +1,4 @@
-# v2 渲染器（成片）所需
 numpy>=2.0
 pillow>=11.0
 scipy>=1.13
-# 可选：原始管线 src/（素材生成、配乐、旧版 skia 渲染）另需 skia-python、pyfluidsynth 等，见 pyproject.toml
+tinysoundfont>=0.3.4

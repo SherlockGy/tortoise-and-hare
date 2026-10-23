@@ -1,7 +1,7 @@
 .env
 .venv/
 __pycache__/
-v2/cache/
+renderer/cache/
 out/
 *.mp4
 .DS_Store
@@ -9,3 +9,7 @@ out/
 .env.*
 !.env.example
 *.pyc
+
+# Codex 写出的绿底/品红底原图，仓库不附带
+assets/raw/
+assets/regen/**/*.log

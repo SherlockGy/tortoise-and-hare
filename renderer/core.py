@@ -1,11 +1,11 @@
-# v2 渲染核心：精灵缓存、镜头、背景、字幕、缓动
-import math, json, sys
+# 渲染核心：精灵缓存、镜头、背景、字幕、缓动（Pillow + NumPy；v4 成片用这套）
+import math
 from functools import lru_cache
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
-ROOT = Path(__file__).resolve().parent.parent; CACHE = ROOT/'v2/cache'
-sys.path.append(str(ROOT/'src'))
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+ROOT = Path(__file__).resolve().parent.parent
+CACHE = ROOT / "renderer" / "cache"
 W, H, FPS = 1920, 1080, 30
 G = 925  # 地面线
 FONT_SUB = str(ROOT/'assets/fonts/ZCOOLKuaiLe-Regular.ttf')
@@ -166,6 +166,11 @@ def gallop(frame, cam, x, ph, scale=1.0, flip=False, alpha=1.0, y=G):
     put(frame, cam, name, x - (cxo if not flip else -cxo), y + dy2*scale, scale=scale, flip=flip, rot=(-rot if flip else rot), alpha=alpha, shadow_y=y)
 
 def _centroid_offsets():
+    missing = [n for n, _, _ in GALLOP if not (CACHE / f"{n}.png").exists()]
+    if missing:
+        raise SystemExit(
+            f"缺少预缩放缓存 {CACHE}（{', '.join(missing)}）。请先运行: python3 renderer/prep.py"
+        )
     out = {}
     for n, _, _ in GALLOP:
         a = np.asarray(base(n).getchannel('A')).astype(np.float32)

@@ -1,8 +1,8 @@
-# v2 渲染：多进程分段渲染 -> 拼接 -> 混入原配乐（含旁白/音效）
-import sys, os, subprocess, math
+# 渲染：多进程分段渲染 -> 拼接 -> 混入配乐（配乐文件里已含旁白和音效）
+import sys, os, subprocess
 from multiprocessing import Pool
 from core import *
-from v2scenes import ORDER, fn_of
+from scenes import ORDER, fn_of
 from timeline import TL, TOTAL, voice_spans
 XF = 0.4
 SPANS = voice_spans()

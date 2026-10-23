@@ -1,139 +1,153 @@
-# Tortoise and the Hare · 龟兔赛跑（纸艺木偶动画 v4）
+# 龟兔赛跑 · 纸艺木偶动画（v4）
 
 <p align="center">
   <img src="covers/cover_16x9.png" width="100%" alt="龟兔赛跑 横版封面">
 </p>
 
-一部约 **3 分 56 秒**的中文儿童动画短片，讲伊索寓言《龟兔赛跑》。画面是纸艺剪纸 + 毛毡质感的绘本风格，配温柔女声旁白、字幕和原创管弦配乐。
+一部 **3 分 56 秒**的中文儿童短片，讲伊索寓言《龟兔赛跑》。画面是纸艺剪纸加毛毡质感，配温柔女声旁白、烧录字幕和管弦配乐。
 
-整部片子**用代码逐帧渲染**，没有用任何动画软件。本仓库是 v2 及之后版本的重制管线（v4 成片：1920×1080 / 30 fps / H.264 + AAC）。
+整部片子用代码逐帧画出来，没有用动画软件。成片规格写在 `renderer/render.py` 里：**1920×1080、30 fps、H.264 + AAC**。时间轴总长 `236.40` 秒（`renderer/timeline.py` 里各幕时长之和，再加 `1.5` 秒片尾）。
 
-> **[下载 v4 成片](https://github.com/SherlockGy/tortoise-and-hare/releases/download/v4/tortoise-and-hare-v4.mp4)**。视频通过 GitHub Release 发布；按下方步骤可在 `out/龟兔赛跑.mp4` 重新生成成片。
+画面渲染用的是 **Python、Pillow、NumPy**，多进程把原始帧送给 **ffmpeg**。配乐脚本另外用到 SciPy 和 tinysoundfont。**不用 Skia。** 更早一次用 Skia 写的渲染器已经从仓库里删除。
 
-## 亮点
+> **[下载 v4 成片](https://github.com/SherlockGy/tortoise-and-hare/releases/download/v4/tortoise-and-hare-v4.mp4)**（GitHub Release `v4`）。按下面的步骤可以在本地重新渲染，输出 `out/龟兔赛跑.mp4`。
 
-- **自然的兔子奔跑**：用 codex CLI 重新生成了四足奔跑循环（蓄力 → 蹬地 → 腾空 → 落地）四帧，统一比例并按头身质心对齐。前进距离与步频绑定，不会滑步。
-- **角色踩在实地上**：每张背景都标定了地面线，角色只走画里真实存在的小路和草地，脚下有接触阴影。
-- **镜头与道具同一坐标系**：镜头越出背景边界时修正的是镜头本身，所以终点门、起点横幅、树桩等道具和背景严格同步，不会漂移。
-- **跟拍视差**：跑步段背景慢移、前景草地快移，加上速度线和扬尘。
-- **素材化的终点丝带**：红丝带用 codex 生成的素材切成竖条沿曲线摆放（简易布料变形）。未断时下垂飘动，被乌龟撞断后两半挂在立柱上自然垂落、来回摆动。
-- **音画同步**：画面、配乐、旁白、字幕共用 `src/timeline.py` 的时间轴，动作对齐配乐里的哨声、断带声、鼾声、心跳等音效。
+## 画面里实际在做的事
+
+- 兔子奔跑用 `assets/regen/gallop_1~4_cut.png` 四帧循环（蓄力、蹬地、腾空、落地）。`renderer/core.py` 按头部和全身质心对齐，前进距离跟步频绑在一起。
+- 每张背景有一条地面线（`BG_Y`）。镜头如果会画出背景，改的是镜头自己的中心，道具和背景一起动。
+- 跟拍时背景慢移、前景草快移，并画速度线和扬尘。
+- 终点红丝带用生成的素材切成竖条，沿曲线摆。撞断后两半挂在立柱上。
+- 字幕、旁白入点和配乐共用 `renderer/timeline.py`。配乐脚本里的哨声、断带、鼾声、心跳用的是同一套拍点。
 
 ## 封面
 
-三种画幅各自由 **Codex CLI 的图像生成单独绘制**（不是从一张图裁出来，也不是用片中素材拼合）。生成时把项目原有的兔子、乌龟 PNG 和背景作为角色和画风参考。随后 `v2/cover_finalize.py` 按目标比例等比裁切、缩放到精确像素（不拉伸），再用项目字体 ZCOOL 加上标题“龟兔赛跑”。
+三种画幅各由 **Codex CLI** 单独画一张，不是从一张图裁出来的，也不是用片中角色拼的。无标题原图在 `assets/regen/covers/`。`renderer/cover.py` 按目标比例等比裁切、缩放到精确像素，再用站酷庆科黄油体写上“龟兔赛跑”，站酷快乐体写上英文副标题，存到 `covers/`。
 
 | 横版 16:9（1920×1080） | 横版 4:3（1440×1080） | 竖版 9:16（1080×1920） |
 |---|---|---|
 | ![横版封面 16:9](covers/cover_16x9.png) | ![横版封面 4:3](covers/cover_4x3.png) | ![竖版封面 9:16](covers/cover_9x16.png) |
 
-### 重新生成封面
-
-需要本机已安装并登录 [Codex CLI](https://github.com/openai/codex)，且能使用它的图像生成功能。脚本默认读取原始管线的 `assets/raw/` 参考图；如果只有本代码包，可以把脚本里的 `RAW` 改成 `assets/cut`。
+重新生成需要本机已安装并登录 [Codex CLI](https://github.com/openai/codex)，并且 `codex` 在 `PATH` 里。脚本默认用仓库里已有的 `assets/cut/` 当角色和画风参考。当初生成时附的是未提交的绿底原图 `assets/raw/`；如果本地还有那份原图，可以设 `REF_DIR`。
 
 ```bash
 cd assets/regen/covers
-# 提示词：prompt_common.txt（通用画风与构图要求）+ prompt_cover_<画幅>.txt（各画幅构图）
-./gen_covers.sh                 # 生成缺失的封面原图（三张并行，各自独立生成）
-rm cover_4x3.png && ./gen_covers.sh cover_4x3   # 只重画某一张
+# 提示词：prompt_common.txt + prompt_cover_<画幅>.txt
+bash gen_covers.sh                              # 生成缺失的无标题原图
+rm cover_4x3.png && bash gen_covers.sh cover_4x3
+# REF_DIR=/path/to/assets/raw bash gen_covers.sh
 cd ../../..
-python3 v2/cover_finalize.py    # 裁切到精确尺寸 + 加标题 → covers/
-# 可微调裁切中心和标题位置，例如：python3 v2/cover_finalize.py cover_4x3:cy=0.45,ty=0.12,tx=0.4
+python3 renderer/cover.py
+# 可改裁切中心和标题位置，例如：
+# python3 renderer/cover.py cover_4x3:cy=0.45,ty=0.12,tx=0.4
 ```
 
-脚本里实际执行的命令（每张封面一次）：
+脚本里每张封面实际执行的是：
 
 ```bash
 codex exec --skip-git-repo-check -s workspace-write \
-  -i assets/raw/hare_stand.png -i assets/raw/hare_sprint.png \
-  -i assets/raw/tortoise_stand.png -i assets/raw/tortoise_determined.png \
-  -i assets/raw/bg_start.png -   # 提示词从标准输入传入
+  -i assets/cut/hare_stand.png -i assets/cut/hare_sprint.png \
+  -i assets/cut/tortoise_stand.png -i assets/cut/tortoise_determined.png \
+  -i assets/cut/bg_start.png -
 ```
 
-## 目录结构
+## 目录
 
 ```
 .
 ├── README.md
-├── THIRD_PARTY_NOTICES.md   # 第三方内容、字体/音色库许可证、AI 生成说明
-├── requirements.txt         # v2 渲染器依赖
-├── pyproject.toml           # 原始管线（含 skia 等）依赖
-├── covers/                  # 封面成品：cover_16x9.png / cover_4x3.png / cover_9x16.png（Codex 生成 + 加标题）
-├── v2/                      # v2+ 渲染器（成片用这个）
-│   ├── core.py              # 精灵缓存、镜头、背景/跟拍背景、字幕、缓动、奔跑/步行循环
-│   ├── v2scenes.py          # 13 幕分镜：每个函数输入幕内秒数，返回一帧
-│   ├── render.py            # 多进程分段渲染 → 拼接 → 混入配乐
-│   ├── prep_v2.py           # 把素材预缩放到成片尺寸，生成 v2/cache/
-│   ├── cover_finalize.py    # 封面后期：Codex 原图等比裁切到精确尺寸 + ZCOOL 标题 → covers/
-│   ├── key_regen.py         # 对 assets/regen 下的绿底原图抠图
-│   └── snap.py              # 调试：抽指定时间点拼成检查图
-├── src/                     # 原始管线（时间轴、旁白、配乐、素材生成/抠图、旧版渲染）
-│   ├── timeline.py          # ★ 全片时间轴与旁白入点（v2 也用它）
-│   ├── prep.py              # 纯色背景抠图算法（key_regen 复用）
-│   ├── gen_assets.py        # 用 codex CLI 批量生成素材的提示词与脚本
-│   ├── narration.py / minimax.py   # MiniMax 旁白合成（需要自己的 API Key，放 .env，不随包提供）
-│   ├── music.py             # 程序化编曲 + 混音（需 GeneralUser GS 音色库）
-│   └── engine.py / scenes.py / ...  # v1 旧版 skia 渲染器（仅供参考）
+├── THIRD_PARTY_NOTICES.md
+├── pyproject.toml              # 与 requirements.txt 同一份依赖
+├── requirements.txt
+├── covers/                     # 加过标题的封面
+├── renderer/                   # 成片渲染
+│   ├── timeline.py             # 13 幕时间轴、旁白入点；读取 assets/voice/voice.json
+│   ├── core.py                 # 精灵、镜头、背景、字幕、奔跑/走路
+│   ├── scenes.py               # 13 幕分镜
+│   ├── prep.py                 # 把素材预缩放到 renderer/cache/
+│   ├── render.py               # 多进程渲染、拼接、混入配乐
+│   ├── cover.py                # 封面裁切 + 标题
+│   └── snap.py                 # 按秒抽帧，拼成检查图
+├── tools/                      # 重新生成素材、旁白、配乐（渲染不必运行）
+│   ├── gen_assets.py           # Codex CLI → assets/raw/（仓库里没有这个目录）
+│   ├── key_raw.py              # assets/raw/ → assets/cut/
+│   ├── key_regen.py            # assets/regen/*.png → *_cut.png
+│   ├── narration.py            # 旁白文稿；调用 minimax.py
+│   ├── minimax.py              # MiniMax 语音接口
+│   └── music.py                # 写出 out/music.wav（不是成片用的 m4a）
 └── assets/
-    ├── cut/                 # 抠好的角色、背景、道具 PNG
-    ├── regen/               # v2 新生成：gallop_1~4（兔子奔跑）、ribbon / ribbon_half（红丝带）及生成脚本
-    │   └── covers/          # Codex 封面原图（无标题）+ gen_covers.sh + 提示词 prompt_*.txt
-    ├── fonts/               # ZCOOL 快乐体（字幕）、ZCOOL 庆科黄油体（标题）
-    ├── voice/               # 43 句旁白 wav + voice.json（文本与时长）
-    └── music/music.m4a      # 成片配乐（已混入旁白、音效，人声处自动压低）
+    ├── cut/                    # 已抠好的角色、背景、道具
+    ├── regen/                  # 奔跑帧、红丝带、封面原图，以及生成脚本和提示词
+    ├── fonts/                  # 站酷快乐体、站酷庆科黄油体
+    ├── voice/                  # 43 句 wav + voice.json
+    └── music/music.m4a         # 成片配乐（已混入旁白和音效）
 ```
 
-## 环境要求
+`renderer/cache/`、`out/`、`assets/raw/` 由脚本生成，已写进 `.gitignore`。
 
-- Python ≥ 3.11（在 3.13 上测试）
-- ffmpeg（命令行可用，需带 libx264）
-- 内存 ≥ 8 GB，CPU 越多越快（8 核约 2 分钟渲染完整片）
+## 安装
+
+- Python 3.11 或以上
+- ffmpeg，并且支持 libx264 和 AAC
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-# macOS: brew install ffmpeg    Ubuntu: sudo apt install ffmpeg
 ```
+
+依赖就是当前代码 import 的四个第三方包：`numpy`、`pillow`、`scipy`、`tinysoundfont`。`pyproject.toml` 与 `requirements.txt` 相同。NumPy 和 Pillow 用于画面；SciPy 用于抠图（`tools/key_raw.py`）和配乐（`tools/music.py`）；tinysoundfont 只用于配乐。
 
 ## 渲染
 
 ```bash
-# 1) 预缩放素材（只需一次，生成 v2/cache/）
-python3 v2/prep_v2.py
+# 预缩放。读 assets/cut/*.png 和 assets/regen/*_cut.png，写入 renderer/cache/
+python3 renderer/prep.py
 
-# 2) 渲染完整成片 → out/龟兔赛跑.mp4
-PROCS=6 python3 v2/render.py
+# 整片 → out/龟兔赛跑.mp4
+PROCS=6 python3 renderer/render.py
 
-# 只渲染一段（按帧号，30 fps）：例如 2:42–2:52 冲线段
-PROCS=4 python3 v2/render.py out/test_chunks 4860 5160 out/test_finish.mp4
-
-# 封面：Codex 原图 → 精确尺寸 + 标题（重新生成原图见上文“重新生成封面”）
-python3 v2/cover_finalize.py
+# 只渲染一段（帧号，30 fps）。下面大约是 2:45–2:48，冲线断带前后
+PROCS=4 python3 renderer/render.py out/test_chunks 4950 5040 out/test_finish.mp4
 
 # 抽几个时间点（秒）拼成检查图
-python3 v2/snap.py out/check.jpg 3 62 137 165.8 200
+python3 renderer/snap.py out/check.jpg 3 50 88 138 155 169 195 225
 ```
 
-## 管线说明
+`render.py` 的参数是：`输出分段目录 [起始帧] [结束帧] [成片路径]`。分段默认 300 帧一块，进程数读环境变量 `PROCS`（默认 6）。音频从 `assets/music/music.m4a` 按起始帧对应的时间截取。
 
-1. **素材**：`src/gen_assets.py` 调用 codex CLI 生成绿/品红纯色底的角色、背景、道具，`src/prep.py` 抠图得到 `assets/cut/`。v2 新增的奔跑帧和丝带由 `assets/regen/*.sh` 生成，`v2/key_regen.py` 抠图。
-2. **旁白**：`src/narration.py` 通过 MiniMax `speech-2.8-hd` 合成 43 句旁白，得到 `assets/voice/`。
-3. **时间轴**：`src/timeline.py` 用“每幕速度 + 小节数”定义 13 幕，旁白入点用拍号表示，全片共用。
-4. **配乐**：`src/music.py` 用 GeneralUser GS 音色程序编曲、合成音效，铺入旁白并做闪避，得到 `music.wav`。本包附的是它的 AAC 版 `assets/music/music.m4a`。
-5. **画面（v2）**：`v2/prep_v2.py` 预缩放素材。`v2/v2scenes.py` 逐幕描述角色位置、动作帧、镜头，以及粒子（扬尘、落叶、Z 字、彩纸、萤火虫）。`v2/core.py` 负责合成、字幕和交叉淡化。`v2/render.py` 用多进程把帧直接管道给 ffmpeg 编码，再拼接并混入配乐。
+## 素材是怎么来的
 
-## 版本记录
+渲染成片**只需要仓库里已经有的文件**。下面这些脚本用来重做素材；缺 API、缺音色库或缺 Codex 时不用跑。
 
-- **v2**：重写渲染器；兔子改用四足奔跑循环；重新排版每一幕；字幕放大；跟拍视差。
-- **v3**：角色只走画里真实的路面和草地；修正镜头越界导致终点门等道具漂移的问题，冲线段固定机位。
-- **v4**：“乌龟已经快到终点了”改为从山坡远眺（终点和乌龟都远且小，之后逐步拉近）；猫头鹰地图的虚线终点正好落在旗杆底部；终点红丝带改用生成的素材，并做了自然的断开、垂落、摆动动画。
+1. **角色、背景、道具。** `tools/gen_assets.py` 调用 Codex CLI，把绿底或品红底原图写到 `assets/raw/`。`tools/key_raw.py` 抠图、裁边，道具拼版拆开，写到 `assets/cut/`。`assets/raw/` 没有放进仓库。`renderer/prep.py` 不读它。
+2. **奔跑帧和红丝带。** `assets/regen/gen_run.sh`、`assets/regen/gen_ribbon.sh` 调用 Codex CLI，写出绿底 PNG。`tools/key_regen.py` 抠成 `*_cut.png`。这两张脚本默认参考 `assets/cut/`，也可以用 `REF_DIR` 指向自己的 `assets/raw/`。
+3. **旁白。** `tools/narration.py` 通过 MiniMax `speech-2.8-hd` 合成 43 句，写 `assets/voice/*.wav` 和 `assets/voice/voice.json`。密钥放在环境变量 `MINIMAX_API_KEY`，或仓库根目录的 `.env`（不提交）。画面渲染只读 `voice.json` 的文本和时长。
+4. **配乐。** `tools/music.py` 用 GeneralUser GS 音色编曲、合成音效，按时间轴把 wav 旁白铺进去并压低有人声的段落，写出 `out/music.wav`。音色库文件 `assets/sf/GeneralUser-GS.sf2` 不在仓库里。成片读的是已经做好的 `assets/music/music.m4a`（AAC）。仓库里没有把 wav 转成 m4a 的脚本。
+5. **画面。** `renderer/prep.py` 预缩放。`renderer/scenes.py` 按幕放角色、镜头和粒子（扬尘、落叶、速度线、汗珠、Z、彩纸、萤火虫）。`renderer/core.py` 合成、字幕、幕与幕之间的交叉淡化。`renderer/render.py` 把帧送给 ffmpeg。
+6. **封面。** 见上面的「封面」。
+
+`assets/cut/` 里有些姿势当前分镜没有画上去（例如 `hare_run_a`、`hare_run_b`、`hare_sprint`、`hare_snore`、`tortoise_tired`、`tortoise_look_back`、鸟、云、秒表和若干小道具）。`prep.py` 仍会把目录里每一张 PNG 缩进缓存。这些文件留着，是因为它们和用到的图来自同一次素材生成。
+
+### `assets/raw` 不在仓库里
+
+绿底和品红底原图没有提交。没有它们就不能重跑 `tools/key_raw.py`。要重新得到那批原图，只能再跑 `tools/gen_assets.py`（需要 Codex CLI），它会新建 `assets/raw/`。
+
+已经提交的 `assets/cut/` 和 `assets/regen/*_cut.png` 足够完成预缩放和渲染。不要把 `RAW` 指到 `assets/cut/` 再去抠图：那些文件已经是透明背景，再按绿底去抠会把图毁了。Codex 的参考图用 `assets/cut/` 是可以的，抠图输入不行。
+
+## 版本
+
+- **v2**：渲染改成 Pillow。兔子改用四帧奔跑。字幕放大。跟拍用视差。
+- **v3**：角色走在画面里的路面和草地上。镜头出界时改镜头，终点门一类道具不再单独漂。冲线用固定机位。
+- **v4**：醒来后先从山坡上看见远处很小的终点和乌龟，再拉近。猫头鹰地图的虚线终点落在旗杆底部。红丝带改用生成的素材，并做断开、垂落和摆动。
+
+本仓库保留的是做出 v4 成片的这条管线。
 
 ## 素材与致谢
 
-- 角色、背景、道具，兔子奔跑帧（`assets/regen/gallop_*`）、红丝带（`assets/regen/ribbon*`）以及三张封面插画（`assets/regen/covers/`）：由 **OpenAI codex CLI** 的图像生成功能生成。
+- 图像：OpenAI Codex CLI。
 - 旁白：MiniMax 语音合成。
-- 字体：ZCOOL 快乐体、ZCOOL 庆科黄油体（SIL OFL 1.1）。
-- 音色库：GeneralUser GS（S. Christian Collins，GeneralUser GS License v2.0，本包未附带音色库文件）。
+- 字体：站酷快乐体、站酷庆科黄油体（SIL OFL 1.1）。
+- 音色库：GeneralUser GS（S. Christian Collins，GeneralUser GS License v2.0）。仓库未附带音色库文件。
 - 故事：伊索寓言《龟兔赛跑》，公版。
 
 详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

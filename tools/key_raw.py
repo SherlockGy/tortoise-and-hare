@@ -1,4 +1,5 @@
-# 素材预处理：纯色背景抠图、裁边、拆分道具拼版、背景整理
+# 素材预处理：把 assets/raw 里的纯色背景原图抠图、裁边、拆分道具拼版，写入 assets/cut/
+# assets/raw 没有放进仓库。渲染成片用的是已经提交的 assets/cut/，不必运行本脚本。
 import json
 from pathlib import Path
 
@@ -87,6 +88,13 @@ def split_sheet(rgba, names, min_area=1500):
 
 
 def main():
+    if not RAW.is_dir() or not any(RAW.glob("*.png")):
+        raise SystemExit(
+            "缺少 assets/raw 里的绿底/品红底原图。这些原图没有放进仓库。\n"
+            "重新生成：安装并登录 Codex CLI 后运行 python3 tools/gen_assets.py，"
+            "它会把原图写到 assets/raw/，然后再运行本脚本抠图到 assets/cut/。\n"
+            "渲染成片不需要这一步，直接使用已提交的 assets/cut/。"
+        )
     CUT.mkdir(parents=True, exist_ok=True)
     meta = {}
     for f in sorted(RAW.glob("*.png")):
