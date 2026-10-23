@@ -87,13 +87,21 @@ codex exec --skip-git-repo-check -s workspace-write \
 
 ## 安装
 
-- Python 3.11 或以上
+- Python 3.11 或以上（本次在 Python 3.12.3 上安装依赖并渲出检查帧）
 - ffmpeg，并且支持 libx264 和 AAC
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
+`tinysoundfont` 依赖 PyAudio。在 Ubuntu 24.04 上 PyAudio 没有现成的 wheel，这次安装前需要：
+
+```bash
+sudo apt install python3-dev portaudio19-dev
+```
+
+少了这两个包时，编译停在找不到 `Python.h`。其他系统同样需要 PortAudio 和 Python 头文件。只渲染画面也会装上这个库，因为依赖文件按整条管线列出，没有再拆一份。
 
 依赖就是当前代码 import 的四个第三方包：`numpy`、`pillow`、`scipy`、`tinysoundfont`。`pyproject.toml` 与 `requirements.txt` 相同。NumPy 和 Pillow 用于画面；SciPy 用于抠图（`tools/key_raw.py`）和配乐（`tools/music.py`）；tinysoundfont 只用于配乐。
 

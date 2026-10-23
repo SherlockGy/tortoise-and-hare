@@ -1,5 +1,6 @@
 # 抽几个时间点的成片帧，缩小后拼成一张检查图
 import sys
+from pathlib import Path
 from PIL import Image, ImageDraw
 from render import frame
 
@@ -16,6 +17,7 @@ def main(argv=None):
         im = frame(T).resize((w, h))
         ImageDraw.Draw(im).text((8, 8), f"{T:.1f}", fill=(255, 0, 0))
         sheet.paste(im, ((i % cols) * w, (i // cols) * h))
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out)
     print(out, "frames", len(ts))
 
