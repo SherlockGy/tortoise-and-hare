@@ -57,8 +57,9 @@ codex exec --skip-git-repo-check -s workspace-write \
 .
 ├── README.md
 ├── THIRD_PARTY_NOTICES.md
-├── pyproject.toml              # 与 requirements.txt 同一份依赖
-├── requirements.txt
+├── pyproject.toml              # 渲染依赖；可选额外依赖 music = SciPy + tinysoundfont
+├── requirements.txt            # 只渲染：numpy、pillow
+├── requirements-tools.txt      # 抠图与配乐额外需要的包
 ├── covers/                     # 加过标题的封面
 ├── renderer/                   # 成片渲染
 │   ├── timeline.py             # 13 幕时间轴、旁白入点；读取 assets/voice/voice.json
@@ -95,15 +96,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`tinysoundfont` 依赖 PyAudio。在 Ubuntu 24.04 上 PyAudio 没有现成的 wheel，这次安装前需要：
-
-```bash
-sudo apt install python3-dev portaudio19-dev
-```
-
-少了这两个包时，编译停在找不到 `Python.h`。其他系统同样需要 PortAudio 和 Python 头文件。只渲染画面也会装上这个库，因为依赖文件按整条管线列出，没有再拆一份。
-
-依赖就是当前代码 import 的四个第三方包：`numpy`、`pillow`、`scipy`、`tinysoundfont`。`pyproject.toml` 与 `requirements.txt` 相同。NumPy 和 Pillow 用于画面；SciPy 用于抠图（`tools/key_raw.py`）和配乐（`tools/music.py`）；tinysoundfont 只用于配乐。
+`renderer/` 只 import `numpy` 和 `pillow`。SciPy 和 tinysoundfont 不在这一步里。
 
 ## 渲染
 
@@ -131,6 +124,21 @@ python3 renderer/snap.py out/check.jpg 3 50 88 138 155 169 195 225
 2. **奔跑帧和红丝带。** `assets/regen/gen_run.sh`、`assets/regen/gen_ribbon.sh` 调用 Codex CLI，写出绿底 PNG。`tools/key_regen.py` 抠成 `*_cut.png`。这两张脚本默认参考 `assets/cut/`，也可以用 `REF_DIR` 指向自己的 `assets/raw/`。
 3. **旁白。** `tools/narration.py` 通过 MiniMax `speech-2.8-hd` 合成 43 句，写 `assets/voice/*.wav` 和 `assets/voice/voice.json`。密钥放在环境变量 `MINIMAX_API_KEY`，或仓库根目录的 `.env`（不提交）。画面渲染只读 `voice.json` 的文本和时长。
 4. **配乐。** `tools/music.py` 用 GeneralUser GS 音色编曲、合成音效，按时间轴把 wav 旁白铺进去并压低有人声的段落，写出 `out/music.wav`。音色库文件 `assets/sf/GeneralUser-GS.sf2` 不在仓库里。成片读的是已经做好的 `assets/music/music.m4a`（AAC）。仓库里没有把 wav 转成 m4a 的脚本。
+
+   抠图脚本 `tools/key_raw.py` import SciPy；`tools/music.py` import SciPy 和 tinysoundfont。这两项在可选依赖 `music` 里，不在渲染安装里：
+
+   ```bash
+   pip install -r requirements-tools.txt
+   # 或者，在仓库根目录：pip install -e ".[music]"
+   ```
+
+   tinysoundfont 会再安装 PyAudio。在 Ubuntu 24.04 上 PyAudio 没有现成的 wheel，编译前需要：
+
+   ```bash
+   sudo apt install python3-dev portaudio19-dev
+   ```
+
+   少了这两个包时，编译停在找不到 `Python.h`。其他系统同样需要 PortAudio 和 Python 头文件。只跑 `renderer/` 不用装它们。
 5. **画面。** `renderer/prep.py` 预缩放。`renderer/scenes.py` 按幕放角色、镜头和粒子（扬尘、落叶、速度线、汗珠、Z、彩纸、萤火虫）。`renderer/core.py` 合成、字幕、幕与幕之间的交叉淡化。`renderer/render.py` 把帧送给 ffmpeg。
 6. **封面。** 见上面的「封面」。
 

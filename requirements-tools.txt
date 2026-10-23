@@ -1,0 +1,4 @@
+# 渲染成片不需要。抠图（tools/key_raw.py）和配乐（tools/music.py）在 requirements.txt 之外还要这些包。
+# tinysoundfont 会安装 PyAudio；Ubuntu 上编译它需要 python3-dev 和 portaudio19-dev。
+scipy>=1.13
+tinysoundfont>=0.3.4
